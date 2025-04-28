@@ -1,0 +1,6 @@
+VehicleId,LoadCap,FuelCap,RouteSequence,Municipalities,DemandSatisfied,InitialLoad,InitialFuel,Distance,Time,TotalCost
+1,80,1720,1-1-1,0,,80,1720,0,0.0,0
+2,60,1510,1-1-1,0,,60,1510,0,0.0,0
+3,50,1300,1-1-1,0,,50,1300,0,0.0,0
+4,40,1100,1-2-2-1,1,30,40,1100,1,0.9,5710
+5,30,870,1-1-1,0,,30,870,0,0.0,0
