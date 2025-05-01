@@ -1,2 +1,2 @@
-DepotID,Latitude,Longitude,Updated
-1,10.963889,-74.796387,Yes
+LocationID,DepotID,Longitude,Latitude
+1,-74.153536,4.743359
