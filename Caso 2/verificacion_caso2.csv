@@ -1,5 +1,0 @@
-VehicleId,LoadCap,FuelCap,RouteSequence,Municipalities,DemandSatisfied,InitLoad,InitFuel,RefuelStops,RefuelAmounts,Distance,Time,FuelCost,TotalCost
-1,80.0,1720,EST1 - MUN10_Ibagué - EST2 - MUN11_Manizales - EST8 - MUN9_Santa Marta,5,0 - 5.5 - 5.5 - 30.0 - 0.0 - 0.0 - 12.0 - 0.0 - 0.0,5.5,1720,3,0.0 - 0.0 - 0.0,1444.7,1805.9,0.0,88358.4
-3,50.0,1300,EST1 - MUN11_Manizales - EST4 - MUN9_Santa Marta - EST5 - MUN10_Ibagué,5,0 - 0.0 - 0.0 - 22.0 - 5.0 - 5.0 - 18.0 - 0.0 - 0.0,0.0,1300,3,0.0 - 0.0 - 0.0,966.0,1207.5,0.0,59611.9
-4,40.0,1100,EST1 - MUN10_Ibagué - EST6 - MUN9_Santa Marta - EST7 - MUN11_Manizales,5,0 - 0.0 - 0.0 - 15.0 - 0.0 - 0.0 - 17.0 - 0.0 - 0.0,0.0,1100,3,0.0 - 0.0 - 0.0,1560.9,1951.1,0.0,95172.8
-5,30.0,870,EST1 - MUN11_Manizales - EST3 - MUN10_Ibagué,3,0 - 4.5 - 4.5 - 25.0 - 0.0 - 0.0,4.5,870,2,0.0 - 0.0,662.3,827.8,0.0,40830.2
