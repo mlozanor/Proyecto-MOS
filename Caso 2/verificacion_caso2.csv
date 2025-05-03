@@ -1,0 +1,6 @@
+VehicleId,LoadCap,FuelCap,RouteSequence,Municipalities,DemandSatisfied,InitLoad,InitFuel,RefuelStops,RefuelAmounts,Distance,Time,FuelCost,TotalCost
+1,80.0,1720,PTO,0,,0,1720,0,0,261.6,5.2,0,1672
+2,60.0,1510,PTO,0,,0,1510,0,0,423.9,8.5,0,1672
+3,50.0,1300,PTO,0,,0,1300,0,0,237.1,4.7,0,1672
+4,40.0,1100,PTO,0,,0,1100,0,0,0.0,0.0,0,1672
+5,30.0,870,PTO,0,,0,870,0,0,146.0,2.9,0,1672
