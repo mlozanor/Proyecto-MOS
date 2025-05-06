@@ -25,10 +25,13 @@ param fuel_price {N} >= 0;  # Precio de combustible en cada nodo
 # ========================
 # Variables
 # ========================
-var x {V, N, N} >= 0, <= 1;         # Flujo de vehículo v de i a j
-var z {V} >= 0, <= 1;               # Fracción del vehículo utilizado
-var f {V, N, N} >= 0;               # Nivel de combustible en tránsito
-var r {V, N} >= 0;                  # Cantidad de recarga en nodo i
+var x {V, N, N} binary;         # Flujo de vehículo v de i a j
+var z {V} >= 0, <= 1;           # Fracción del vehículo utilizado
+var f {V, N, N} >= 0;           # Nivel de combustible en tránsito
+var r {V, N} >= 0;              # Cantidad de recarga en nodo i
+
+# Variables para eliminación de subtours (MTZ mejorado)
+var u {V, N} >= 0;              # Variable de posición en la ruta
 
 # ========================
 # Función Objetivo
@@ -80,3 +83,30 @@ subject to RefuelStations {v in V, i in N diff (E union P)}:
 # R10: Límite máximo de recarga según flujo
 subject to RefuelLimit {v in V, i in E union P}:
     r[v,i] <= F_cap[v] * sum {j in N : j != i} x[v,j,i];
+
+# ✅ Continuidad en estaciones
+subject to StationContinuity {v in V, e in E}:
+    sum {i in N : i != e} x[v,i,e] = sum {j in N : j != e} x[v,e,j];
+
+# ✅ Entrada/salida única en depósito (opcional pero recomendado)
+subject to DepotSingleExit {v in V}:
+    sum {j in N : j != 'PTO01'} x[v,'PTO01',j] <= 1;
+
+subject to DepotSingleEntry {v in V}:
+    sum {i in N : i != 'PTO01'} x[v,i,'PTO01'] <= 1;
+
+# ========================
+# Restricciones MTZ mejoradas para eliminación de subtours
+# ========================
+
+# Inicializar el contador de posición para el depósito
+subject to InitPosition {v in V, i in P}:
+    u[v,i] = 0;
+
+# Acotar la variable u para nodos no visitados
+subject to BoundPosition {v in V, i in N diff P}:
+    u[v,i] <= card(N) * sum {j in N: j != i} x[v,j,i];
+
+# Asegurar incremento de posición entre nodos conectados
+subject to SubtourElimMTZ {v in V, i in N diff P, j in N diff P: i != j}:
+    u[v,i] + 1 <= u[v,j] + card(N) * (1 - x[v,i,j]);
