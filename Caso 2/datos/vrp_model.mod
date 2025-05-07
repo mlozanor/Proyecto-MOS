@@ -110,3 +110,14 @@ subject to BoundPosition {v in V, i in N diff P}:
 # Asegurar incremento de posición entre nodos conectados
 subject to SubtourElimMTZ {v in V, i in N diff P, j in N diff P: i != j}:
     u[v,i] + 1 <= u[v,j] + card(N) * (1 - x[v,i,j]);
+
+# ✅ Umbral mínimo de combustible antes de salir a otro nodo
+subject to FuelMinThreshold {v in V, i in N, j in N : i != j}:
+    f[v,i,j] >= 0.3 * F_cap[v] * x[v,i,j];
+
+
+set MustPassThrough within (N cross N cross E);
+
+# 🚨 Nueva restricción: Forzar paso por estaciones si están en MustPassThrough
+subject to ForcePassStations {v in V, (i, j, e) in MustPassThrough}:
+    x[v, i, j] <= x[v, i, e] + x[v, e, j];
