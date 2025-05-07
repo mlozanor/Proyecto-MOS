@@ -118,6 +118,10 @@ subject to FuelMinThreshold {v in V, i in N, j in N : i != j}:
 
 set MustPassThrough within (N cross N cross E);
 
-# 🚨 Nueva restricción: Forzar paso por estaciones si están en MustPassThrough
+#  Nueva restricción: Forzar paso por estaciones si están en MustPassThrough
 subject to ForcePassStations {v in V, (i, j, e) in MustPassThrough}:
     x[v, i, j] <= x[v, i, e] + x[v, e, j];
+
+#  Nueva restricción: Si pasa por una estación, debe recargar algo
+subject to MustRefuelIfVisit {v in V, e in E}:
+    r[v,e] >= 0.1 * sum {i in N : i != e} x[v,i,e];
