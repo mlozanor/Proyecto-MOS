@@ -1,4 +1,4 @@
-# vrp_model.mod
+# vrp_model.mod (Versión Modificada)
 
 # ========================
 # Conjuntos
@@ -9,7 +9,6 @@ set N;   # Todos los nodos
 set D within N;  # Clientes (Municipios)
 set P within N;  # Depósito
 set E within N;  # Estaciones
-set T within N;  # Peajes
 
 # ========================
 # Parámetros
@@ -25,9 +24,9 @@ param F_cap {V} >= 0;    # Capacidad de combustible del vehículo
 param demand {D} >= 0;   # Demanda de los clientes
 param fuel_price {N} >= 0;  # Precio de combustible en cada nodo
 
-# Nuevos parámetros para peajes
-param toll_base_rate {T} >= 0;  # Tarifa base del peaje
-param toll_rate_per_ton {T} >= 0;  # Tarifa adicional por tonelada
+# Nuevos parámetros para peajes asociados a municipios
+param toll_base_rate {D} >= 0 default 0;  # Tarifa base del peaje en el municipio
+param toll_rate_per_ton {D} >= 0 default 0;  # Tarifa adicional por tonelada en el municipio
 param weight {V} >= 0;  # Peso del vehículo en toneladas
 param max_weight {D} >= 0 default 999;  # Peso máximo permitido por municipio
 
@@ -43,9 +42,6 @@ var r {V, N} >= 0;              # Cantidad de recarga en nodo i
 # Variables para eliminación de subtours (MTZ mejorado)
 var u {V, N} >= 0;              # Variable de posición en la ruta
 
-# Variable para rastrear tránsito por peajes
-var toll_used {V, T} binary;    # 1 si el vehículo v usa el peaje t
-
 # ========================
 # Función Objetivo
 # ========================
@@ -53,7 +49,8 @@ var toll_used {V, T} binary;    # 1 si el vehículo v usa el peaje t
 minimize TotalCost:
   sum {v in V, i in N, j in N : i != j} (Ft + Cm) * dist[i,j] * x[v,i,j] + 
   sum {v in V, i in N} fuel_price[i] * r[v,i] +
-  sum {v in V, t in T} (toll_base_rate[t] + toll_rate_per_ton[t] * weight[v]) * toll_used[v,t];
+  # Costos de peajes integrados en municipios visitados
+  sum {v in V, d in D} (toll_base_rate[d] + toll_rate_per_ton[d] * weight[v]) * sum {i in N : i != d} x[v,i,d];
 
 # ========================
 # Restricciones
@@ -99,33 +96,22 @@ subject to RefuelStations {v in V, i in N diff (E union P)}:
 subject to RefuelLimit {v in V, i in E union P}:
   r[v,i] <= F_cap[v] * sum {j in N : j != i} x[v,j,i];
 
-# ✅ Continuidad en estaciones
+# Continuidad en estaciones
 subject to StationContinuity {v in V, e in E}:
   sum {i in N : i != e} x[v,i,e] = sum {j in N : j != e} x[v,e,j];
 
-# ✅ Continuidad en peajes
-subject to TollContinuity {v in V, t in T}:
-  sum {i in N : i != t} x[v,i,t] = sum {j in N : j != t} x[v,t,j];
-
-# ✅ Entrada/salida única en depósito (opcional pero recomendado)
+# Entrada/salida única en depósito
 subject to DepotSingleExit {v in V}:
   sum {j in N : j != 'PTO01'} x[v,'PTO01',j] <= 1;
 
 subject to DepotSingleEntry {v in V}:
   sum {i in N : i != 'PTO01'} x[v,i,'PTO01'] <= 1;
 
-# ✅ Nueva restricción: Limitar tránsito por municipios según peso máximo
+# Restricción de peso máximo en municipios
 subject to WeightLimit {v in V, d in D}:
   weight[v] * sum {i in N : i != d} x[v,i,d] <= max_weight[d];
 
-# ✅ Nueva restricción: Activar el uso de peajes
-subject to TollUsage {v in V, t in T, j in N : t != j}:
-  x[v,t,j] <= toll_used[v,t];
-
-# ========================
-# Restricciones MTZ mejoradas para eliminación de subtours
-# ========================
-
+# Restricciones de eliminación de subtours
 # Inicializar el contador de posición para el depósito
 subject to InitPosition {v in V, i in P}:
   u[v,i] = 0;
@@ -142,6 +128,7 @@ subject to SubtourElimMTZ {v in V, i in N diff P, j in N diff P: i != j}:
 subject to FuelMinThreshold {v in V, i in N, j in N : i != j}:
   f[v,i,j] >= 0.3 * F_cap[v] * x[v,i,j];
 
+# Define conjunto para estaciones
 set MustPassThrough within (N cross N cross E);
 
 # Forzar paso por estaciones si están en MustPassThrough
@@ -151,4 +138,3 @@ subject to ForcePassStations {v in V, (i, j, e) in MustPassThrough}:
 # Si pasa por una estación, debe recargar algo
 subject to MustRefuelIfVisit {v in V, e in E}:
   r[v,e] >= 0.1 * sum {i in N : i != e} x[v,i,e];
-

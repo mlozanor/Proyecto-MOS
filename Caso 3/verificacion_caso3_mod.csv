@@ -1,0 +1,1 @@
+VehicleId,LoadCap,FuelCap,RouteSequence,Municipalities,DemandSatisfied,InitLoad,InitFuel,RefuelStops,RefuelAmounts,MunicipalitiesWithTolls,TollCosts,VehicleWeights,Distance,Time,FuelCost,TollCost,TotalCost
