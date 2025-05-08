@@ -152,5 +152,3 @@ subject to ForcePassStations {v in V, (i, j, e) in MustPassThrough}:
 subject to MustRefuelIfVisit {v in V, e in E}:
   r[v,e] >= 0.1 * sum {i in N : i != e} x[v,i,e];
 
-option presolve 0;
-option gurobi_options 'resultfile=results.ilp infeasibility=1';
